@@ -32,6 +32,17 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handle IllegalStateException
+     * @param ex IllegalStateException
+     * @return Response entity with error message
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
+        log.warn("Request Error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    /**
      * Handle general exception
      * @param ex Exception
      * @return Response entity with error message

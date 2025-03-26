@@ -1,0 +1,19 @@
+DELETE FROM order_items;
+DELETE FROM orders;
+DELETE FROM products;
+
+MERGE INTO products (id, name, price, stock)
+KEY(id)
+VALUES
+(1, 'Pilsner Urquell světlý ležák', 31.90, 10),
+(2, 'Velkopopovický Kozel 11', 19.90, 15),
+(3, 'Radegast Ryze hořká 12', 23.90, 30),
+(4, 'Svijanský Máz', 18.90, 25),
+(5, 'Krušovice Bohém', 15.90, 40);
+
+MERGE INTO orders (id, created_at, paid) KEY(id) VALUES (1,  NOW(), true);
+MERGE INTO orders (id, created_at, paid) KEY(id) VALUES (2,  NOW(), false);
+
+MERGE INTO order_items (order_id, product_id, quantity) KEY(order_id, product_id) VALUES (1, 3, 3);
+MERGE INTO order_items (order_id, product_id, quantity) KEY(order_id, product_id) VALUES (2, 1, 2);
+MERGE INTO order_items (order_id, product_id, quantity) KEY(order_id, product_id) VALUES (2, 2, 1);

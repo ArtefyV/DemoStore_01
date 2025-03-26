@@ -44,13 +44,13 @@ public class OrderService {
      * @param id Order ID
      * @return Order object
      */
-    public Optional<Order> getOrderById(Long id) {
+    public Order getOrderById(Long id) {
         log.info("Getting order by ID {}", id);
-        return Optional.ofNullable(orderRepository.findById(id)
+        return orderRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Order with ID {} not found", id);
                     return new NotFoundException("Order not found");
-                }));
+                });
     }
 
     /**
@@ -109,22 +109,27 @@ public class OrderService {
         log.info("The order with ID {} has been canceled", id);
     }
 
+
     /**
      * Pay for an order
      * @param id Order ID
+     * @return Order object
      */
-    @Transactional
-    public void payForOrder(Long id) {
-        log.info("Order payment with ID {}", id);
+    public Order payOrder(Long id) {
+        log.info("Paying for order with ID {}", id);
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Attempting to pay for a non-existent order with ID {}", id);
-                    return new NotFoundException("Order not found");
+                    return new NotFoundException("Order with ID " + id + " not found");
                 });
 
+        if (order.isPaid()) {
+            throw new IllegalStateException("Order with ID " + id + " already paid");
+        }
+
         order.setPaid(true);
-        orderRepository.save(order);
         log.info("The order with ID {} has been successfully paid", id);
+        return orderRepository.save(order);
     }
 
     /**

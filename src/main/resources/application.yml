@@ -4,12 +4,17 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
+    sql-script-encoding: UTF-8
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
     show-sql: true
-
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:sql/test_data.sql
   h2:
     console:
       enabled: true
@@ -21,7 +26,10 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
   api-docs:
+    enabled: true
     path: /v3/api-docs
 
 logging:

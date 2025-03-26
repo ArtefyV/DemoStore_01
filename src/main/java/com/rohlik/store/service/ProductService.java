@@ -36,13 +36,13 @@ public class ProductService {
      * @param id Product ID
      * @return Product object
      */
-    public Optional<Product> getProductById(Long id) {
+    public Product getProductById(Long id) {
         log.info("Getting a product by ID {}", id);
-        return Optional.ofNullable(productRepository.findById(id)
+        return productRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Product by ID {} not found", id);
                     return new NotFoundException("Product not found");
-                }));
+                });
     }
 
     /**

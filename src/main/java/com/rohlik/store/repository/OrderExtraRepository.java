@@ -1,12 +1,12 @@
 package com.rohlik.store.repository;
 
-import com.rohlik.store.model.Order;
+import com.rohlik.store.model.OrderExtra;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Long> {
-    List<Order> findByPaid(boolean paid);
+public interface OrderExtraRepository extends JpaRepository<OrderExtra, Long> {
+    List<OrderExtra> findByPaid(boolean paid);
 }

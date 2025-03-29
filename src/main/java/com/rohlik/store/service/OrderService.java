@@ -3,40 +3,38 @@ package com.rohlik.store.service;
 import com.rohlik.store.exception.InsufficientStockException;
 import com.rohlik.store.exception.NotFoundException;
 import com.rohlik.store.model.Order;
-import com.rohlik.store.model.OrderItem;
+import com.rohlik.store.model.OrderExtra;
+import com.rohlik.store.model.OrderProduct;
 import com.rohlik.store.model.Product;
+import com.rohlik.store.repository.OrderExtraRepository;
+import com.rohlik.store.repository.OrderProductRepository;
 import com.rohlik.store.repository.OrderRepository;
 import com.rohlik.store.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderExtraRepository orderExtraRepository;
     private final ProductRepository productRepository;
-    /**
-     * Constructor
-     * @param orderRepository Order repository
-     * @param productRepository Product repository
-     */
-    public OrderService(OrderRepository orderRepository, ProductRepository productRepository) {
-        this.orderRepository = orderRepository;
-        this.productRepository = productRepository;
-    }
+    private final OrderProductRepository orderProductRepository;
+
 
     /**
      * Get a list of all orders
      * @return List of all orders
      */
-    public List<Order> getAllOrders() {
+    public List<OrderExtra> getAllOrders() {
         log.info("Getting a list of all orders");
-        return orderRepository.findAll();
+        return orderExtraRepository.findAll();
     }
 
     /**
@@ -44,9 +42,9 @@ public class OrderService {
      * @param id Order ID
      * @return Order object
      */
-    public Order getOrderById(Long id) {
+    public OrderExtra getOrderById(Long id) {
         log.info("Getting order by ID {}", id);
-        return orderRepository.findById(id)
+        return orderExtraRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Order with ID {} not found", id);
                     return new NotFoundException("Order not found");
@@ -59,9 +57,12 @@ public class OrderService {
      * @return
      */
     @Transactional
-    public Order createOrder(Order order) {
+    public OrderExtra createOrder(Order order, List<OrderProduct> items) {
         log.info("Creating a new order...");
-        for (OrderItem item : order.getItems()) {
+        order.prePersist();
+        Order savedOrder = orderRepository.save(order);
+
+        for (OrderProduct item : items) {
             Product product = productRepository.findById(item.getProduct().getId())
                     .orElseThrow(() -> {
                         log.warn("Product with ID {} not found, order cannot be created", item.getProduct().getId());
@@ -77,18 +78,29 @@ public class OrderService {
             log.info("Reserving item {} in quantity {}", product.getName(), item.getQuantity());
             product.setStockQuantity(product.getStockQuantity() - item.getQuantity());
             productRepository.save(product);
+
+            item.setOrder(savedOrder);
+            orderProductRepository.save(item);
         }
 
-        order.setPaid(false);
-        Order savedOrder = orderRepository.save(order);
         log.info("An order was created with ID {}", savedOrder.getId());
-        return savedOrder;
+        return new OrderExtra(savedOrder.getId(), savedOrder.getCreatedAt(), savedOrder.isPaid(), items);
     }
+
+/*
+    public Order updateOrder(Order order){
+        log.info("Updating order with ID {}", order.getId());
+        Order updatedOrder = orderRepository.save(order);
+        log.info("Order with ID {} has been updated", updatedOrder.getId());
+        return updatedOrder;
+    }
+*/
 
     /**
      * Cancel an order
      * @param id Order ID
      */
+/*
     @Transactional
     public void cancelOrder(Long id) {
         log.info("Cancel order with ID {}", id);
@@ -98,7 +110,7 @@ public class OrderService {
                     return new NotFoundException("Order not found");
                 });
 
-        for (OrderItem item : order.getItems()) {
+        for (OrderProduct item : order.getItems()) {
             Product product = item.getProduct();
             log.info("Return goods {} in quantity {}", product.getName(), item.getQuantity());
             product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
@@ -109,15 +121,16 @@ public class OrderService {
         log.info("The order with ID {} has been canceled", id);
     }
 
+*/
 
     /**
      * Pay for an order
      * @param id Order ID
      * @return Order object
      */
-    public Order payOrder(Long id) {
+    public OrderExtra payOrder(Long id) {
         log.info("Paying for order with ID {}", id);
-        Order order = orderRepository.findById(id)
+        OrderExtra order = orderExtraRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Attempting to pay for a non-existent order with ID {}", id);
                     return new NotFoundException("Order with ID " + id + " not found");
@@ -128,8 +141,10 @@ public class OrderService {
         }
 
         order.setPaid(true);
+        Order updatingOrder = new Order(order.getId(), order.getCreatedAt(), order.isPaid());
+        orderRepository.save(updatingOrder);
         log.info("The order with ID {} has been successfully paid", id);
-        return orderRepository.save(order);
+        return order;
     }
 
     /**
@@ -139,8 +154,8 @@ public class OrderService {
      *             false - not paid
      * @return List of orders
      */
-    public List<Order> getOrdersByPaidStatus(boolean paid) {
+    public List<OrderExtra> getOrdersByPaidStatus(boolean paid) {
         log.info("Getting a list of orders by paid status: {}", paid);
-        return orderRepository.findByPaid(paid);
+        return orderExtraRepository.findByPaid(paid);
     }
 }

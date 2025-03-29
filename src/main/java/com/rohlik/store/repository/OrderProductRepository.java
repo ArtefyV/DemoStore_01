@@ -1,10 +1,9 @@
 package com.rohlik.store.repository;
 
-import com.rohlik.store.model.Product;
+import com.rohlik.store.model.OrderProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Long> {
-    Product findByName(String name);
+public interface OrderProductRepository extends JpaRepository<OrderProduct, Long> {
 }

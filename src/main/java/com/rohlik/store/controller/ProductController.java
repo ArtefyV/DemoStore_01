@@ -1,5 +1,7 @@
 package com.rohlik.store.controller;
 
+import com.rohlik.store.dto.ProductDTO;
+import com.rohlik.store.mapper.ProductMapper;
 import com.rohlik.store.model.Product;
 import com.rohlik.store.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,10 +10,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -20,14 +24,19 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductMapper productMapper;
 
     @Operation(summary = "Get all products", description = "Returns a list of all products")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of products found")
     })
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        List<ProductDTO> products = productService.getAllProducts()
+                .stream()
+                .map(productMapper::toProductDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(products);
     }
 
     @Operation(summary = "Get product by ID", description = "Returns the product by its ID")
@@ -36,17 +45,21 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Product not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.getProductById(id));
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
+        ProductDTO product = productMapper.toProductDTO(productService.getProductById(id));
+        return ResponseEntity.ok(product);
     }
 
     @Operation(summary = "Create product", description = "Creates a new product")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Product created")
+            @ApiResponse(responseCode = "201", description = "Product created")
     })
     @PostMapping
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        return ResponseEntity.ok(productService.createProduct(product));
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDTO) {
+        Product product = productMapper.toProduct(productDTO);
+        ProductDTO createdProduct = productMapper.toProductDTO(productService.createProduct(product));
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
     @Operation(summary = "Update product", description = "Updates an existing product")
@@ -55,8 +68,10 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Product not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
-        return ResponseEntity.ok(productService.updateProduct(id, product));
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDTO productDTO) {
+        Product product = productMapper.toProduct(productDTO);
+        ProductDTO updatedProduct = productMapper.toProductDTO(productService.updateProduct(id, product));
+        return ResponseEntity.ok(updatedProduct);
     }
 
     @Operation(summary = "Delete product", description = "Deletes an existing product")

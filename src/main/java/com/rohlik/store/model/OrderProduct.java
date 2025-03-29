@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "order_items")
 @Data
-public class OrderItem {
+public class OrderProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

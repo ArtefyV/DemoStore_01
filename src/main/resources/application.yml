@@ -38,3 +38,7 @@ logging:
     com.rohlik.store: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%t] %c{1} - %msg%n"
+
+order:
+  expiration-time-minutes: 30  # Order lifetime (minutes)
+  check-interval-ms: 10000     # Inspection frequency (milliseconds)

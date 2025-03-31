@@ -12,9 +12,12 @@ import com.rohlik.store.repository.OrderRepository;
 import com.rohlik.store.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -26,6 +29,9 @@ public class OrderService {
     private final OrderExtraRepository orderExtraRepository;
     private final ProductRepository productRepository;
     private final OrderProductRepository orderProductRepository;
+
+    @Value("${order.expiration-time-minutes}")
+    private int orderExpirationTime;
 
 
     /**
@@ -80,6 +86,7 @@ public class OrderService {
             productRepository.save(product);
 
             item.setOrder(savedOrder);
+            item.setProduct(product);
             orderProductRepository.save(item);
         }
 
@@ -88,7 +95,7 @@ public class OrderService {
     }
 
     /**
-     * Cancel an order
+     * Cancel an order by its ID
      * @param id Order ID
      */
     @Transactional
@@ -146,5 +153,28 @@ public class OrderService {
     public List<OrderExtra> getOrdersByPaidStatus(boolean paid) {
         log.info("Getting a list of orders by paid status: {}", paid);
         return orderExtraRepository.findByPaid(paid);
+    }
+
+    /**
+     * Cancel expired orders by a scheduled task
+     */
+    @Scheduled(fixedRateString = "${order.check-interval-ms}")
+    @Transactional
+    public void cancelExpiredOrders() {
+        LocalDateTime threshold = LocalDateTime.now().minusMinutes(orderExpirationTime);
+        List<OrderExtra> expiredOrders = orderExtraRepository.findByPaidFalseAndCreatedAtBefore(threshold);
+
+        for (OrderExtra order : expiredOrders) {
+            log.info("Cancel expired order ID {}", order.getId());
+
+            for (OrderProduct item : order.getItems()) {
+                Product product = item.getProduct();
+                log.info("Return goods {} in quantity {} during cancelling of expired order ID {}", product.getName(), item.getQuantity(), order.getId());
+                product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                productRepository.save(product);
+            }
+
+            orderExtraRepository.delete(order);
+        }
     }
 }

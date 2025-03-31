@@ -67,9 +67,15 @@ public class ProductService {
         return productRepository.findById(id)
                 .map(product -> {
                     log.info("Product found, updating...");
-                    product.setName(updatedProduct.getName());
-                    product.setPrice(updatedProduct.getPrice());
-                    product.setStockQuantity(updatedProduct.getStockQuantity());
+                    if (updatedProduct.getName() != null) {
+                        product.setName(updatedProduct.getName());
+                    }
+                    if (updatedProduct.getPrice() != null) {
+                        product.setPrice(updatedProduct.getPrice());
+                    }
+                    if (updatedProduct.getStockQuantity() != null) {
+                        product.setStockQuantity(updatedProduct.getStockQuantity());
+                    }
                     return productRepository.save(product);
                 })
                 .orElseThrow(() -> {

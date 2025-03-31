@@ -1,8 +1,9 @@
 package com.rohlik.store.controller;
 
+import com.rohlik.store.dto.CreateProductDTO;
 import com.rohlik.store.dto.ProductDTO;
+import com.rohlik.store.dto.UpdateProductDTO;
 import com.rohlik.store.mapper.ProductMapper;
-import com.rohlik.store.model.Product;
 import com.rohlik.store.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -56,9 +57,8 @@ public class ProductController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDTO) {
-        Product product = productMapper.toProduct(productDTO);
-        ProductDTO createdProduct = productMapper.toProductDTO(productService.createProduct(product));
+    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody CreateProductDTO dto) {
+        ProductDTO createdProduct = productMapper.toProductDTO(productService.createProduct(productMapper.toProduct(dto)));
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
@@ -68,9 +68,8 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Product not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDTO productDTO) {
-        Product product = productMapper.toProduct(productDTO);
-        ProductDTO updatedProduct = productMapper.toProductDTO(productService.updateProduct(id, product));
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductDTO dto) {
+        ProductDTO updatedProduct = productMapper.toProductDTO(productService.updateProduct(id, productMapper.toProduct(dto)));
         return ResponseEntity.ok(updatedProduct);
     }
 

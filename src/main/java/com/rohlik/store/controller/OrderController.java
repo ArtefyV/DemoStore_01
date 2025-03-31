@@ -2,7 +2,6 @@ package com.rohlik.store.controller;
 
 import com.rohlik.store.dto.CreateOrderDTO;
 import com.rohlik.store.dto.OrderDTO;
-import com.rohlik.store.dto.UpdateOrderDTO;
 import com.rohlik.store.mapper.OrderMapper;
 import com.rohlik.store.mapper.OrderProductMapper;
 import com.rohlik.store.service.OrderService;
@@ -64,18 +63,6 @@ public class OrderController {
         OrderDTO createdOrder = orderMapper.toOrderDTO(orderService.createOrder(orderMapper.toOrder(dto), orderProductMapper.toOrderProducts(dto)));
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
-/*
-
-    @Operation(summary = "Update order", description = "Updates an existing order")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Order updated"),
-            @ApiResponse(responseCode = "404", description = "Order not found")
-    })
-    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @Valid @RequestBody UpdateOrderDTO dto) {
-        OrderDTO updatedOrder = orderMapper.toOrderDTO(orderService.updateOrder(orderMapper.toOrder(dto)));
-        return ResponseEntity.ok(updatedOrder);
-    }
-*/
 
     @Operation(summary = "Update status of order", description = "Updates status of an existing order to paid")
     @ApiResponses(value = {
@@ -88,7 +75,6 @@ public class OrderController {
         OrderDTO updatedOrder = orderMapper.toOrderDTO(orderService.payOrder(id));
         return ResponseEntity.ok(updatedOrder);
     }
-/*
 
     @Operation(summary = "Cancel order", description = "Cancels an existing order")
     @ApiResponses(value = {
@@ -101,7 +87,6 @@ public class OrderController {
     public void cancelOrder(@PathVariable Long id) {
         orderService.cancelOrder(id);
     }
-*/
 
     @Operation(summary = "Get orders by paid status", description = "Returns a list of orders by paid status")
     @ApiResponses(value = {

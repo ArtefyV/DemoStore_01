@@ -87,24 +87,14 @@ public class OrderService {
         return new OrderExtra(savedOrder.getId(), savedOrder.getCreatedAt(), savedOrder.isPaid(), items);
     }
 
-/*
-    public Order updateOrder(Order order){
-        log.info("Updating order with ID {}", order.getId());
-        Order updatedOrder = orderRepository.save(order);
-        log.info("Order with ID {} has been updated", updatedOrder.getId());
-        return updatedOrder;
-    }
-*/
-
     /**
      * Cancel an order
      * @param id Order ID
      */
-/*
     @Transactional
     public void cancelOrder(Long id) {
         log.info("Cancel order with ID {}", id);
-        Order order = orderRepository.findById(id)
+        OrderExtra order = orderExtraRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Attempting to cancel a non-existent order with ID {}", id);
                     return new NotFoundException("Order not found");
@@ -117,11 +107,10 @@ public class OrderService {
             productRepository.save(product);
         }
 
-        orderRepository.deleteById(id);
+        orderExtraRepository.deleteById(id);
         log.info("The order with ID {} has been canceled", id);
     }
 
-*/
 
     /**
      * Pay for an order

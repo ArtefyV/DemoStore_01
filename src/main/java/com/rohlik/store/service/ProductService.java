@@ -2,24 +2,23 @@ package com.rohlik.store.service;
 
 import com.rohlik.store.exception.NotFoundException;
 import com.rohlik.store.model.Product;
+import com.rohlik.store.repository.OrderProductRepository;
 import com.rohlik.store.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
-    /**
-     * Constructor
-     * @param productRepository Product repository
-     */
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
+    private final OrderProductRepository orderProductRepository;
 
     /**
      * Get a list of all products
@@ -51,6 +50,9 @@ public class ProductService {
      */
     @Transactional
     public Product createProduct(Product product) {
+        if (product.getName() == null || product.getName().isEmpty() || product.getPrice() == null || product.getPrice().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Invalid product data");
+        }
         log.info("Creation of a new product: {}", product.getName());
         return productRepository.save(product);
     }
@@ -67,13 +69,13 @@ public class ProductService {
         return productRepository.findById(id)
                 .map(product -> {
                     log.info("Product found, updating...");
-                    if (updatedProduct.getName() != null) {
+                    if (updatedProduct.getName() != null && !updatedProduct.getName().isEmpty()) {
                         product.setName(updatedProduct.getName());
                     }
-                    if (updatedProduct.getPrice() != null) {
+                    if (updatedProduct.getPrice() != null && updatedProduct.getPrice().compareTo(BigDecimal.ZERO) >= 0) {
                         product.setPrice(updatedProduct.getPrice());
                     }
-                    if (updatedProduct.getStockQuantity() != null) {
+                    if (updatedProduct.getStockQuantity() != null && updatedProduct.getStockQuantity() >= 0) {
                         product.setStockQuantity(updatedProduct.getStockQuantity());
                     }
                     return productRepository.save(product);
@@ -90,6 +92,10 @@ public class ProductService {
      */
     @Transactional
     public void deleteProduct(Long id) {
+        if (orderProductRepository.existsById(id)) {
+            log.warn("Attempting to delete a product with ID {} that is associated with existing orders", id);
+            throw new IllegalStateException("Cannot delete product that is associated with existing orders");
+        }
         if (productRepository.existsById(id)) {
             log.info("Deleting product by ID {}", id);
             productRepository.deleteById(id);

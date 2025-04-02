@@ -44,8 +44,14 @@ The application is available for testing through Swagger. Additionally, JUnit an
 
 To enhance the application's efficiency and performance, the following improvements can be made:
 - **Asynchronous Task Queue**: Replace scheduling with an asynchronous task queue using Kafka or RabbitMQ for better performance in high-load scenarios.
-- **Frontend Development**: Currently, the application does not have a frontend, but it can be developed later.
 - **Cloud Deployment**: Deploy the application to a cloud service and manage it with Kubernetes for better scalability and reliability.
+
+## Feature Enhancements
+
+To expand the application's functionality, the following enhancements can be made:
+- **Frontend Development**: Currently, the application does not have a frontend, but it can be developed later.
+- **Localization System**: Implement a national localization system for the product catalog, including different language versions of product names, measurement units, and currencies for respective countries.
+- **Product Data Enhancement**: Expand the product details to include product images, packaging information, size and weight, and descriptions of consumer qualities.
 
 ## Scalability
 

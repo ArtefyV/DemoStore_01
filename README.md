@@ -44,7 +44,10 @@ The application is available for testing through Swagger. Additionally, JUnit an
 
 To enhance the application's efficiency and performance, the following improvements can be made:
 - **Asynchronous Task Queue**: Replace scheduling with an asynchronous task queue using Kafka or RabbitMQ for better performance in high-load scenarios.
-- **Cloud Deployment**: Deploy the application to a cloud service and manage it with Kubernetes for better scalability and reliability.
+- **Microservices Architecture**: As the application functionality and code base grows, it makes sense to split the application into microservices to allow independent scaling of different components.
+- **Cloud Deployment**: The application is currently ready to run in a Docker container. It can be deployed to a cloud service and managed with Kubernetes. This will allow for better scalability and reliability.
+- **Monitoring and Logging**: Implement monitoring and logging tools like Prometheus, Grafana and ELK stack to track application performance and troubleshoot issues.
+- **Security Enhancements**: Implement security measures like HTTPS, CORS, and CSRF protection to secure the application.
 
 ## Feature Enhancements
 
@@ -52,10 +55,24 @@ To expand the application's functionality, the following enhancements can be mad
 - **Frontend Development**: Currently, the application does not have a frontend, but it can be developed later.
 - **Localization System**: Implement a national localization system for the product catalog, including different language versions of product names, measurement units, and currencies for respective countries.
 - **Product Data Enhancement**: Expand the product details to include product images, packaging information, size and weight, and descriptions of consumer qualities.
+- **User Authorization System**: Implement a user authorization system to manage user access and permissions.
+- **Administrative Interface**: Create an administrative interface accessible only to authorized personnel, incorporating part of the existing functionality.
+- **Payment Gateway Integration**: Integrate a payment gateway to allow customers to make payments online.
+- **Order Tracking System**: Implement an order tracking system to allow customers to track their orders.
+- **Customer Feedback System**: Implement a customer feedback system to collect and analyze customer reviews and ratings.
+- **Recommendation System**: Implement a recommendation system to suggest products to customers based on their preferences and purchase history.
+- **Mobile Application Development**: Develop a mobile application for the online store to reach a wider audience.
+- **Subscription Service**: Implement a subscription service for customers to receive regular deliveries of products.
+- **Analytics and Reporting**: Implement analytics and reporting tools to track sales, customer behavior, and other key metrics.
+- **SEO Optimization**: Optimize the application for search engines to improve visibility and attract more customers.
 
-## Scalability
+## Data Storage Improvements
 
-The application is currently ready to run in a Docker container. In the future, it can be deployed to a cloud service and managed with Kubernetes. This will allow for better scalability and reliability.
+To improve data storage and handling under high load, the following solutions can be considered:
+- **Relational Database**: Use PostgreSQL or MySQL for storing structured data such as products, orders, and users.
+- **NoSQL Database**: Use MongoDB or Cassandra for storing unstructured data such as documents and image collections.
+- **Cloud Storage**: Use Amazon S3 or Google Cloud Storage for storing large volumes of data like images and documents.
+- **Caching**: Implement caching with Redis or Memcached to improve performance and reduce database load.
 
 ## Known Issues
 

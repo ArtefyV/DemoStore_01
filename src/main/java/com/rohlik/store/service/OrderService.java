@@ -132,6 +132,7 @@ public class OrderService {
      * @param id Order ID
      * @return Order object with updated paid status
      */
+    @Transactional
     public OrderExtra payOrder(Long id) {
         log.info("Paying for order with ID {}", id);
         OrderExtra order = orderExtraRepository.findById(id)

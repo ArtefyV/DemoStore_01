@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -69,8 +68,7 @@ public class OrderController {
             @ApiResponse(responseCode = "200", description = "Order status updated"),
             @ApiResponse(responseCode = "404", description = "Order not found")
     })
-    @PostMapping("/{id}/pay")
-    @Transactional
+    @PutMapping("/{id}/pay")
     public ResponseEntity<OrderDTO> payOrder(@PathVariable Long id) {
         OrderDTO updatedOrder = orderMapper.toOrderDTO(orderService.payOrder(id));
         return ResponseEntity.ok(updatedOrder);
@@ -83,7 +81,6 @@ public class OrderController {
     })
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Transactional
     public void cancelOrder(@PathVariable Long id) {
         orderService.cancelOrder(id);
     }

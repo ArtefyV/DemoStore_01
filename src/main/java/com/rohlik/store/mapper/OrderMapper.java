@@ -42,9 +42,7 @@ public class OrderMapper {
      */
     public Order toOrder(CreateOrderDTO dto) {
         Order order = new Order();
-        if (dto.getPaid() != null) {
-            order.setPaid(dto.getPaid());
-        }
+        order.setPaid(dto.getPaid() != null ? dto.getPaid() : false);
         return order;
     }
 }

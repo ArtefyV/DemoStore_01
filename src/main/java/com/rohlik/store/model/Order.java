@@ -26,6 +26,5 @@ public class Order {
         if (this.createdAt == null) {
             this.createdAt = LocalDateTime.now();
         }
-        this.paid = false;
     }
 }

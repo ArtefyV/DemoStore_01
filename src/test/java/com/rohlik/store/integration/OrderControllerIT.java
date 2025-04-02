@@ -92,7 +92,7 @@ class OrderControllerIT {
     @Test
     void payOrder_ShouldMarkOrderAsPaid() throws Exception {
         System.out.println("Text executing: payOrder_ShouldMarkOrderAsPaid");
-        mockMvc.perform(post("/api/v1/orders/2/pay"))
+        mockMvc.perform(put("/api/v1/orders/2/pay"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paid", is(true)));
 

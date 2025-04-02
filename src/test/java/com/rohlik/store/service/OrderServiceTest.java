@@ -6,6 +6,7 @@ import com.rohlik.store.model.Order;
 import com.rohlik.store.model.OrderExtra;
 import com.rohlik.store.model.OrderProduct;
 import com.rohlik.store.model.Product;
+import com.rohlik.store.repository.OrderExtraRepository;
 import com.rohlik.store.repository.OrderProductRepository;
 import com.rohlik.store.repository.OrderRepository;
 import com.rohlik.store.repository.ProductRepository;
@@ -34,12 +35,16 @@ class OrderServiceTest {
     private ProductRepository productRepository;
 
     @Mock
+    private OrderExtraRepository orderExtraRepository;
+
+    @Mock
     private OrderProductRepository orderProductRepository;
 
     @InjectMocks
     private OrderService orderService;
 
     private Order order;
+    private OrderExtra orderExtra;
     private Product product;
     private OrderProduct orderProduct;
     private List<OrderProduct> items;
@@ -59,6 +64,8 @@ class OrderServiceTest {
         items = Collections.singletonList(orderProduct);
 
         order = new Order();
+        orderExtra = new OrderExtra();
+        orderExtra.setItems(items);
     }
 
     /**
@@ -66,15 +73,12 @@ class OrderServiceTest {
      */
     @Test
     void createOrder_ShouldSucceed_WhenStockIsAvailable() {
-        // Preparation of moks
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(orderProductRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Attempting to create an order
         OrderExtra createdOrder = orderService.createOrder(order, items);
 
-        // Checks
         assertNotNull(createdOrder);
         assertEquals(5, product.getStockQuantity()); // Было 10, заказали 5 → осталось 5
         verify(orderRepository, times(1)).save(any(Order.class));
@@ -86,13 +90,10 @@ class OrderServiceTest {
      */
     @Test
     void createOrder_ShouldThrowException_WhenProductNotFound() {
-        // Simulate absence of the product in the database
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(NotFoundException.class, () -> orderService.createOrder(order, items));
 
-        // Checking method calls
         verify(orderRepository, times(1)).save(any(Order.class));
         verify(orderProductRepository, never()).save(any(OrderProduct.class));
     }
@@ -106,11 +107,116 @@ class OrderServiceTest {
 
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 
-        // Check if the expected exception is thrown
         InsufficientStockException exception = assertThrows(InsufficientStockException.class, () -> orderService.createOrder(order, items));
         assertTrue(exception.getMessage().contains("Insufficient stock"));
 
-        // Checking method call
         verify(orderProductRepository, never()).save(any(OrderProduct.class));
     }
+
+    /**
+     * Test that checks the case of updating the order status to paid.
+     */
+    @Test
+    void payOrder_ShouldMarkOrderAsPaid() {
+        when(orderExtraRepository.findById(1L)).thenReturn(Optional.of(orderExtra));
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        OrderExtra paidOrder = orderService.payOrder(1L);
+
+        assertNotNull(paidOrder);
+        assertTrue(paidOrder.isPaid());
+        verify(orderRepository, times(1)).save(any(Order.class));
+    }
+
+    /**
+     * Test that checks the case of updating the order status, when the order does not exist.
+     */
+    @Test
+    void payOrder_ShouldThrowException_WhenOrderDoesNotExist() {
+        when(orderExtraRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> orderService.payOrder(1L));
+
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    /**
+     * Test of getting a correct order by ID.
+     */
+    @Test
+    void getOrderById_ShouldReturnOrder_WhenOrderExists() {
+        when(orderExtraRepository.findById(1L)).thenReturn(Optional.of(orderExtra));
+
+        OrderExtra foundOrder = orderService.getOrderById(1L);
+
+        assertNotNull(foundOrder);
+        assertEquals(orderExtra, foundOrder);
+        verify(orderExtraRepository, times(1)).findById(1L);
+    }
+
+    /**
+     * Test of getting an order by ID, when the order does not exist.
+     */
+    @Test
+    void getOrderById_ShouldThrowException_WhenOrderDoesNotExist() {
+        when(orderExtraRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> orderService.getOrderById(1L));
+
+        verify(orderExtraRepository, times(1)).findById(1L);
+    }
+
+    /**
+     * Test of getting all orders.
+     */
+    @Test
+    void getAllOrders_ShouldReturnOrders() {
+        when(orderExtraRepository.findAll()).thenReturn(List.of(orderExtra, orderExtra));
+
+        List<OrderExtra> orders = orderService.getAllOrders();
+
+        assertNotNull(orders);
+        assertEquals(2, orders.size());
+        verify(orderExtraRepository, times(1)).findAll();
+    }
+
+    /**
+     * Test of getting all orders, when there are no orders.
+     */
+    @Test
+    void getAllOrders_ShouldReturnEmptyList_WhenNoOrders() {
+        when(orderExtraRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<OrderExtra> orders = orderService.getAllOrders();
+
+        assertNotNull(orders);
+        assertTrue(orders.isEmpty());
+        verify(orderExtraRepository, times(1)).findAll();
+    }
+
+    /**
+     * Test of cancelling an order by ID.
+     */
+    @Test
+    void cancelOrder_ShouldSucceed_WhenOrderExists() {
+        when(orderExtraRepository.findById(1L)).thenReturn(Optional.of(orderExtra));
+
+        orderService.cancelOrder(1L);
+
+        verify(orderExtraRepository, times(1)).deleteById(1L);
+    }
+
+    /**
+     * Test of cancelling an order by ID, when the order does not exist.
+     */
+    @Test
+    void cancelOrder_ShouldThrowException_WhenOrderDoesNotExist() {
+        when(orderExtraRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> orderService.cancelOrder(1L));
+
+        verify(orderExtraRepository, never()).deleteById(1L);
+    }
+
+
 }

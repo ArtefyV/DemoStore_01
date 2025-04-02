@@ -127,12 +127,12 @@ class ProductServiceTest {
     @Test
     void deleteProduct_ShouldSucceed_WhenProductExists() {
         when(productRepository.existsById(1L)).thenReturn(true);
-        when(orderProductRepository.existsById(1L)).thenReturn(false);
+        when(orderProductRepository.existsByProductId(1L)).thenReturn(false);
 
         productService.deleteProduct(1L);
 
         verify(productRepository, times(1)).existsById(1L);
-        verify(orderProductRepository, times(1)).existsById(1L);
+        verify(orderProductRepository, times(1)).existsByProductId(1L);
         verify(productRepository, times(1)).deleteById(1L);
     }
 
@@ -141,10 +141,10 @@ class ProductServiceTest {
      */
     @Test
     void deleteProduct_ShouldThrowException_WhenProductIsInOrder() {
-        when(orderProductRepository.existsById(1L)).thenReturn(true);
+        when(orderProductRepository.existsByProductId(1L)).thenReturn(true);
 
         assertThrows(IllegalStateException.class, () -> productService.deleteProduct(1L));
-        verify(orderProductRepository, times(1)).existsById(1L);
+        verify(orderProductRepository, times(1)).existsByProductId(1L);
         verify(productRepository, never()).deleteById(1L);
     }
 

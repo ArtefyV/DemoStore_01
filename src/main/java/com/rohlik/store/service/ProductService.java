@@ -92,7 +92,7 @@ public class ProductService {
      */
     @Transactional
     public void deleteProduct(Long id) {
-        if (orderProductRepository.existsById(id)) {
+        if (orderProductRepository.existsByProductId(id)) {
             log.warn("Attempting to delete a product with ID {} that is associated with existing orders", id);
             throw new IllegalStateException("Cannot delete product that is associated with existing orders");
         }

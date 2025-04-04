@@ -26,30 +26,12 @@ public class ProductMapper {
     }
 
     /**
-     * Maps ProductDTO to Product entity
-     * @param dto ProductDTO
-     * @return Product entity
-     */
-    public Product toProduct(ProductDTO dto) {
-        Product product = new Product();
-        product.setId(dto.getId());
-        product.setName(dto.getName());
-        product.setPrice(BigDecimal.valueOf(Double.parseDouble(dto.getPrice())));
-        product.setStockQuantity(dto.getStockQuantity());
-        return product;
-    }
-
-    /**
      * Maps CreateProductDTO to Product entity
      * @param dto CreateProductDTO
      * @return Product entity
      */
     public Product toProduct(CreateProductDTO dto) {
-        Product product = new Product();
-        product.setName(dto.getName());
-        product.setPrice(dto.getPrice());
-        product.setStockQuantity(dto.getStockQuantity());
-        return product;
+        return mapToProduct(dto.getName(), dto.getPrice(), dto.getStockQuantity());
     }
 
     /**
@@ -58,10 +40,21 @@ public class ProductMapper {
      * @return Product entity
      */
     public Product toProduct(UpdateProductDTO dto) {
+        return mapToProduct(dto.getName(), dto.getPrice(), dto.getStockQuantity());
+    }
+
+    /**
+     * Private method to map common fields to Product entity
+     * @param name Product name
+     * @param price Product price
+     * @param stockQuantity Product stock quantity
+     * @return Product entity
+     */
+    private Product mapToProduct(String name, BigDecimal price, Integer stockQuantity) {
         Product product = new Product();
-        product.setName(dto.getName());
-        product.setPrice(dto.getPrice());
-        product.setStockQuantity(dto.getStockQuantity());
+        product.setName(name);
+        product.setPrice(price);
+        product.setStockQuantity(stockQuantity);
         return product;
     }
 }

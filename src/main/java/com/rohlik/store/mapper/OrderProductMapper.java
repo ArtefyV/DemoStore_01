@@ -27,15 +27,6 @@ public class OrderProductMapper {
         dto.setProduct(productMapper.toProductDTO(orderProduct.getProduct()));
         return dto;
     }
-/*
-
-    public OrderProduct toOrderProduct(ProductQuantityDTO dto) {
-        OrderProduct orderProduct = new OrderProduct();
-        orderProduct.setQuantity(dto.getQuantity());
-        orderProduct.setProduct(productMapper.toProduct(dto.getProduct()));
-        return orderProduct;
-    }
-*/
 
     /**
      * Maps ProductIdQuantityDTO structure to OrderProduct entity

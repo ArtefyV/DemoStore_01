@@ -22,6 +22,6 @@ public class OrderExtra {
     private LocalDateTime createdAt;
     private boolean paid;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderProduct> items;
 }

@@ -1,6 +1,6 @@
-# Rohlik Store
+# Demo Store 01
 
-**Test application of an online store for Rohlik Group**.
+**Demo application of an online store**.
 
 The main purpose of this application is to demonstrate the functionality of the online store within the technical specifications set by the company.
 
@@ -80,4 +80,4 @@ To improve data storage and handling under high load, the following solutions ca
 
 ## Conclusion
 
-The Rohlik Store application is a demonstration of an online store's functionality. It is currently available for testing and can be improved and scaled in the future.
+The Demo Store application is a demonstration of an online store's functionality. It is currently available for testing and can be improved and scaled in the future.
